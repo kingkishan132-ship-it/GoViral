@@ -44,7 +44,9 @@ function App() {
 const [videoUrl, setVideoUrl] = useState("");
 const [videoDuration, setVideoDuration] = useState(0);
 const [currentTime, setCurrentTime] = useState(0);
-
+const [trimStart, setTrimStart] = useState(0);
+const [trimEnd, setTrimEnd] = useState(0);
+const [splitPoint, setSplitPoint] = useState(null);
 useEffect(() => {
   return () => {
     if (videoUrl) {
