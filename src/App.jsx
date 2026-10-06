@@ -53,12 +53,25 @@ useEffect(() => {
   };
 }, [videoUrl]);
   function handleFile(event) {
-    const file = event.target.files?.[0];
+  const file = event.target.files?.[0];
 
-    if (file) {
-      setFileName(file.name);
-    }
+  if (!file) return;
+
+  if (!file.type.startsWith("video/")) {
+    alert("Please select a video file.");
+    return;
   }
+
+  if (videoUrl) {
+    URL.revokeObjectURL(videoUrl);
+  }
+
+  const url = URL.createObjectURL(file);
+
+  setFileName(file.name);
+  setVideoUrl(url);
+  setCurrentTime(0);
+}
 
   return (
     <div className="app-shell">
