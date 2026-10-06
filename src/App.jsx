@@ -365,8 +365,8 @@ useEffect(() => {
                 </div>
 
                 <div className="timeline-time">
-                  00:42
-                </div>
+  {formatTime(videoDuration)}
+</div>
 
               </div>
 
@@ -666,7 +666,19 @@ useEffect(() => {
     </div>
   );
 }
+ 
+function formatTime(seconds) {
+  if (!seconds || !Number.isFinite(seconds)) {
+    return "00:00";
+  }
 
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  return `${String(minutes).padStart(2, "0")}:${String(
+    remainingSeconds
+  ).padStart(2, "0")}`;
+}
 
 function Plan({
   name,
