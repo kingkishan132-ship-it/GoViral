@@ -41,7 +41,17 @@ function App() {
   const [aspect, setAspect] = useState("9:16");
   const [autoEdit, setAutoEdit] = useState(false);
   const [fileName, setFileName] = useState("");
+const [videoUrl, setVideoUrl] = useState("");
+const [videoDuration, setVideoDuration] = useState(0);
+const [currentTime, setCurrentTime] = useState(0);
 
+useEffect(() => {
+  return () => {
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+  };
+}, [videoUrl]);
   function handleFile(event) {
     const file = event.target.files?.[0];
 
