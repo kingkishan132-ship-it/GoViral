@@ -294,19 +294,25 @@ useEffect(() => {
 
                 <div className="video-frame">
 
-                  <div className="stage-placeholder">
+  {videoUrl ? (
+    <video
+      className="video-preview"
+      src={videoUrl}
+      controls
+      onLoadedMetadata={(event) => {
+        setVideoDuration(event.currentTarget.duration);
+      }}
+      onTimeUpdate={(event) => {
+        setCurrentTime(event.currentTarget.currentTime);
+      }}
+    />
+  ) : (
+    <div className="stage-placeholder">
+      <span>YOUR VIDEO</span>
+    </div>
+  )}
 
-                    <span>
-                      {fileName
-                        ? "VIDEO PREVIEW"
-                        : "YOUR VIDEO"}
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
+</div>
 
 
               {/* TOOLS */}
