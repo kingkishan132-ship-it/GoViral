@@ -1129,3 +1129,75 @@ button {
   object-fit: cover;
   background: #000;
 }
+/* REAL TRIM CONTROLS */
+
+.timeline {
+  position: relative;
+}
+
+.timeline-track {
+  position: relative;
+}
+
+.trim-slider {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+  appearance: none;
+  z-index: 5;
+}
+
+.trim-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.trim-slider::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
+.trim-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 28px;
+  border-radius: 4px;
+  background: #C5FF3D;
+  border: 2px solid #08090B;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+
+.trim-slider::-moz-range-thumb {
+  width: 14px;
+  height: 28px;
+  border-radius: 4px;
+  background: #C5FF3D;
+  border: 2px solid #08090B;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+
+.trim-start {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.trim-end {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #F4F7F1;
+  pointer-events: none;
+  z-index: 4;
+}
