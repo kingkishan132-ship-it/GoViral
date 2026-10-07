@@ -1201,3 +1201,21 @@ button {
   pointer-events: none;
   z-index: 4;
 }
+.split-marker {
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  width: 2px;
+  background: #C5FF3D;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.split-marker span {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #C5FF3D;
+}
