@@ -54,6 +54,29 @@ useEffect(() => {
     }
   };
 }, [videoUrl]);
+
+useEffect(() => {
+  function handlePointerDown(event) {
+    const ripple = document.createElement("span");
+
+    ripple.className = "global-ripple";
+
+    ripple.style.left = `${event.clientX}px`;
+    ripple.style.top = `${event.clientY}px`;
+
+    document.body.appendChild(ripple);
+
+    setTimeout(() => {
+      ripple.remove();
+    }, 550);
+  }
+
+  document.addEventListener("pointerdown", handlePointerDown);
+
+  return () => {
+    document.removeEventListener("pointerdown", handlePointerDown);
+  };
+}, []);
   function handleFile(event) {
   const file = event.target.files?.[0];
 
