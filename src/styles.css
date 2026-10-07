@@ -1219,3 +1219,44 @@ button {
   font-size: 14px;
   color: #C5FF3D;
 }
+.global-ripple {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(197, 255, 61, 0.28);
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: globalRipple 550ms ease-out forwards;
+  z-index: 99999;
+}
+
+@keyframes globalRipple {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  70% {
+    opacity: 0.25;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(8);
+  }
+}
+
+button,
+label {
+  transition:
+    transform 140ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+button:active,
+label:active {
+  transform: scale(0.97);
+}
