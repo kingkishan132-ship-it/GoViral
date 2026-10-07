@@ -345,32 +345,80 @@ useEffect(() => {
 
               {/* TIMELINE */}
 
-              <div className="timeline">
+             <div className="timeline">
 
-                <div className="timeline-time">
-                  00:00
-                </div>
+  <div className="timeline-time">
+    {formatTime(trimStart)}
+  </div>
 
-                <div className="timeline-track">
+  <div className="timeline-track">
 
-                  <div className="timeline-video">
+    <div className="timeline-video">
+      <div className="clip clip-one"></div>
+    </div>
 
-                    <div className="clip clip-one"></div>
-                    <div className="clip clip-two"></div>
-                    <div className="clip clip-three"></div>
-                    <div className="clip clip-four"></div>
+    <input
+      className="trim-slider trim-start"
+      type="range"
+      min="0"
+      max={videoDuration || 0}
+      step="0.1"
+      value={trimStart}
+      disabled={!videoUrl}
+      onChange={(event) => {
+        const value = Number(event.target.value);
 
-                  </div>
+        if (value < trimEnd) {
+          setTrimStart(value);
 
-                  <div className="playhead"></div>
+          const video = document.querySelector(".video-preview");
 
-                </div>
+          if (video) {
+            video.currentTime = value;
+          }
+        }
+      }}
+    />
 
-                <div className="timeline-time">
-  {formatTime(videoDuration)}
+    <input
+      className="trim-slider trim-end"
+      type="range"
+      min="0"
+      max={videoDuration || 0}
+      step="0.1"
+      value={trimEnd}
+      disabled={!videoUrl}
+      onChange={(event) => {
+        const value = Number(event.target.value);
+
+        if (value > trimStart) {
+          setTrimEnd(value);
+
+          const video = document.querySelector(".video-preview");
+
+          if (video) {
+            video.currentTime = value;
+          }
+        }
+      }}
+    />
+
+    <div
+      className="playhead"
+      style={{
+        left: videoDuration
+          ? `${(currentTime / videoDuration) * 100}%`
+          : "0%",
+      }}
+    />
+
+  </div>
+
+  <div className="timeline-time">
+    {formatTime(trimEnd)}
+  </div>
+
 </div>
-
-              </div>
 
 
               {/* AUTO EDIT */}
