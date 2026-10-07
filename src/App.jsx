@@ -330,7 +330,13 @@ useEffect(() => {
                         ? "tool active"
                         : "tool"
                     }
-                    onClick={() => setSelectedTool(name)}
+                    onClick={() => {
+  setSelectedTool(name);
+
+  if (name === "Split" && videoUrl && videoDuration > 0) {
+    setSplitPoint(currentTime);
+  }
+}}
                   >
 
                     <strong>{icon}</strong>
@@ -411,7 +417,16 @@ useEffect(() => {
           : "0%",
       }}
     />
-
+{splitPoint !== null && videoDuration > 0 && (
+  <div
+    className="split-marker"
+    style={{
+      left: `${(splitPoint / videoDuration) * 100}%`,
+    }}
+  >
+    <span>✂</span>
+  </div>
+)}
   </div>
 
   <div className="timeline-time">
