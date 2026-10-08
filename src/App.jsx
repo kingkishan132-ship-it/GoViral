@@ -1,32 +1,178 @@
-import {useEffect,useState} from "react";
+import { useEffect, useRef, useState } from "react";
+import Upload from "./components/Upload.jsx";
+import AutoEdit from "./components/AutoEdit.jsx";
+import Processing from "./components/Processing.jsx";
+import Results from "./components/Results.jsx";
+import Header from "./components/Header.jsx";
 
-const tools=[["✂","Trim"],["＋","Split"],["◐","Crop"],["↗","Zoom"],["T","Text"],["CC","Captions"],["♫","Audio"],["1×","Speed"]];
-const projects=[{name:"Podcast Episode 04",duration:"42:18",status:"Ready"},{name:"Interview — Startup Founder",duration:"28:41",status:"Draft"}];
+const STAGES = ["upload", "auto", "processing", "results"];
 
-function Logo(){return <div className="brand"><div className="brand-mark">G<span>→</span></div><strong>GoViral</strong></div>}
+export default function App() {
+  const [stage, setStage] = useState("upload");
+  const [file, setFile] = useState(null);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [autoEdit, setAutoEdit] = useState(true);
+  const [progress, setProgress] = useState(0);
 
-function App(){
- const [page,setPage]=useState("create"),[selectedTool,setSelectedTool]=useState("Trim"),[aspect,setAspect]=useState("9:16"),[autoEdit,setAutoEdit]=useState(false),[fileName,setFileName]=useState(""),[videoUrl,setVideoUrl]=useState(""),[videoDuration,setVideoDuration]=useState(0),[currentTime,setCurrentTime]=useState(0),[trimStart,setTrimStart]=useState(0),[trimEnd,setTrimEnd]=useState(0),[splitPoint,setSplitPoint]=useState(null);
- useEffect(()=>()=>{if(videoUrl)URL.revokeObjectURL(videoUrl)},[videoUrl]);
- useEffect(()=>{const fn=e=>{const r=document.createElement("span");r.className="global-ripple";r.style.left=e.clientX+"px";r.style.top=e.clientY+"px";document.body.appendChild(r);setTimeout(()=>r.remove(),550)};document.addEventListener("pointerdown",fn);return()=>document.removeEventListener("pointerdown",fn)},[]);
- function handleFile(e){const f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith("video/")){alert("Please select a video file.");return}if(videoUrl)URL.revokeObjectURL(videoUrl);setVideoUrl(URL.createObjectURL(f));setFileName(f.name);setCurrentTime(0);setVideoDuration(0);setTrimStart(0);setTrimEnd(0);setSplitPoint(null)}
- const nav=[["create","＋","Create"],["projects","▣","Projects"],["referral","↗","Earn Access"],["pricing","◇","Plans"]];
- return <div className="app-shell">
-  <aside className="sidebar"><Logo/><nav className="side-nav">{nav.map(([id,ic,label])=><button key={id} className={page===id?"nav-item active":"nav-item"} onClick={()=>setPage(id)}><span>{ic}</span>{label}</button>)}</nav><div className="sidebar-bottom"><button className="nav-item"><span>⚙</span>Settings</button><div className="usage-card"><div className="usage-top"><span>FREE PLAN</span><span>3 / 3</span></div><div className="usage-bar"><div className="usage-fill"/></div><p>3 auto-edits per month on Free.</p></div><div className="user-box"><div className="avatar">K</div><div><strong>Creator</strong><small>Free account</small></div></div></div></aside>
-  <main className="main-area"><header className="topbar"><div><span className="top-label">WORKSPACE</span><h1>{page==="create"?"Create":page==="projects"?"Projects":page==="referral"?"Earn Access":"Plans"}</h1></div><div className="top-actions"><span className="credits">3 auto-edits left</span><button className="profile-button">K</button></div></header>
-  {page==="create"&&<section className="workspace"><div className="workspace-heading"><div><span className="section-kicker">NEW PROJECT</span><h2>Turn a long video<br/>into a <em>short.</em></h2></div><div className="format-control"><span>FORMAT</span><div>{["9:16","1:1","16:9"].map(x=><button key={x} className={aspect===x?"format active":"format"} onClick={()=>setAspect(x)}>{x}</button>)}</div></div></div>
-   <div className="editor-card"><div className="editor-toolbar"><span>{fileName||"SOURCE VIDEO"}</span><span className="green-status">● READY</span></div><div className="upload-area"><div className="upload-icon">↑</div><h3>{fileName||"Drop your long video here"}</h3><p>MP4, MOV or WebM · Recommended under 2GB</p><label className="upload-button">{fileName?"Change video":"Choose video"}<input type="file" accept="video/*" onChange={handleFile} hidden/></label></div></div>
-   <div className="editor-card editor"><div className="editor-toolbar"><span>EDITOR</span><span>{aspect} · 1080p</span></div><div className="video-stage"><div className="video-frame">{videoUrl?<video className="video-preview" src={videoUrl} controls onLoadedMetadata={e=>{const d=e.currentTarget.duration;setVideoDuration(d);setTrimStart(0);setTrimEnd(d)}} onTimeUpdate={e=>{const t=e.currentTarget.currentTime;setCurrentTime(t);if(trimEnd>0&&t>trimEnd)e.currentTarget.currentTime=trimEnd}}/>:<div className="stage-placeholder"><span>YOUR VIDEO</span></div>}</div></div>
-   <div className="tool-row">{tools.map(([ic,n])=><button key={n} className={selectedTool===n?"tool active":"tool"} onClick={()=>{setSelectedTool(n);if(n==="Split"&&videoUrl&&videoDuration>0)setSplitPoint(currentTime)}}><strong>{ic}</strong><span>{n}</span></button>)}</div>
-   <div className="timeline"><div className="timeline-time">{formatTime(trimStart)}</div><div className="timeline-track"><div className="timeline-video"><div className="clip"/></div><input className="trim-slider" type="range" min="0" max={videoDuration||0} step=".1" value={trimStart} disabled={!videoUrl} onChange={e=>{const v=Number(e.target.value);if(v<trimEnd){setTrimStart(v);const el=document.querySelector(".video-preview");if(el)el.currentTime=v}}}/><input className="trim-slider trim-end" type="range" min="0" max={videoDuration||0} step=".1" value={trimEnd} disabled={!videoUrl} onChange={e=>{const v=Number(e.target.value);if(v>trimStart){setTrimEnd(v);const el=document.querySelector(".video-preview");if(el)el.currentTime=v}}}/><div className="playhead" style={{left:videoDuration?(currentTime/videoDuration)*100+"%":"0%"}}/>{splitPoint!==null&&videoDuration>0&&<div className="split-marker" style={{left:(splitPoint/videoDuration)*100+"%"}}><span>✂</span></div>}</div><div className="timeline-time">{formatTime(trimEnd)}</div></div>
-   <div className="auto-edit"><div><div className="auto-title"><span>✦</span>Auto Edit <b>FREE</b></div><p>Find strong moments, create short clips, add captions and reframe them for short-form.</p></div><button className={autoEdit?"switch on":"switch"} onClick={()=>setAutoEdit(!autoEdit)}><span/></button></div>
-   <div className="editor-actions"><button className="secondary-action">Save draft</button><button className="export-button">Export clip →</button></div></div>
-  </section>}
-  {page==="projects"&&<section className="page-section"><div className="page-title-row"><div><span className="section-kicker">YOUR LIBRARY</span><h2>Projects</h2></div><button className="export-button" onClick={()=>setPage("create")}>+ New project</button></div><div className="project-grid">{projects.map(p=><div className="project-card" key={p.name}><div className="project-preview"><span>9:16</span></div><div className="project-info"><div><strong>{p.name}</strong><small>{p.duration}</small></div><span className="project-status">{p.status}</span></div></div>)}</div></section>}
-  {page==="referral"&&<section className="page-section"><span className="section-kicker">VIRAL PASS</span><h2>Earn your access.</h2><p className="large-description">Don't want to pay? Bring real creators to GoViral and unlock premium access.</p><div className="referral-card"><div><span className="referral-label">YOUR REFERRAL</span><div className="referral-code">GOVIRAL-K7X92</div><p>Only genuine active users count. Fake accounts and self-referrals don't qualify.</p></div><button className="export-button">Copy referral link</button></div><div className="referral-stats"><div><strong>0</strong><span>Confirmed</span></div><div><strong>10</strong><span>Needed for Pro Plus</span></div><div><strong>30 days</strong><span>Reward</span></div></div></section>}
-  {page==="pricing"&&<section className="page-section"><span className="section-kicker">PLANS</span><h2>Pay or earn.</h2><p className="large-description">Choose the plan that fits the way you create.</p><div className="plans-grid"><Plan name="Free" price="₹0" description="Try the editor." features={["3 auto-edits / month","720p export","Captions + 9:16 reframing","GoViral watermark"]}/><Plan name="Creator" price="₹199" description="For regular creators." features={["50 exports / month","1080p export","Captions + 9:16 reframing","No watermark"]}/><Plan name="Pro" price="₹499" description="For serious creators." features={["200 exports / month","Advanced editing","Premium presets","Priority exports"]}/><Plan name="Pro Plus" price="₹1,499" description="Let GoViral edit for you." featured features={["Unlimited editing*","Unlimited exports*","Advanced Auto Edit","Auto captions","Auto reframing","Priority processing"]}/></div><p className="fair-use">*Unlimited access is subject to fair-use and abuse protection.</p></section>}
- </main></div>
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
+  }, [videoUrl]);
+
+  function selectFile(nextFile) {
+    if (!nextFile) return;
+
+    if (!nextFile.type.startsWith("video/")) {
+      alert("Please select a video file.");
+      return;
+    }
+
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+
+    const url = URL.createObjectURL(nextFile);
+
+    setFile(nextFile);
+    setVideoUrl(url);
+    setProgress(0);
+    setStage("auto");
+  }
+
+  function handleFileChange(event) {
+    const nextFile = event.target.files?.[0];
+
+    if (nextFile) {
+      selectFile(nextFile);
+    }
+
+    event.target.value = "";
+  }
+
+  function createClips() {
+    if (!file) {
+      inputRef.current?.click();
+      return;
+    }
+
+    setStage("processing");
+    setProgress(4);
+
+    let value = 4;
+
+    const timer = setInterval(() => {
+      value += Math.floor(Math.random() * 8) + 5;
+
+      if (value >= 100) {
+        value = 100;
+        clearInterval(timer);
+
+        setTimeout(() => {
+          setStage("results");
+        }, 350);
+      }
+
+      setProgress(value);
+    }, 220);
+  }
+
+  function startOver() {
+    if (videoUrl) {
+      URL.revokeObjectURL(videoUrl);
+    }
+
+    setFile(null);
+    setVideoUrl("");
+    setProgress(0);
+    setStage("upload");
+  }
+
+  return (
+    <div className="app-shell">
+
+      <Header
+        stage={stage}
+        onStartOver={startOver}
+      />
+
+      <main>
+
+        <div
+          className="stage-progress"
+          aria-label="GoViral workflow progress"
+        >
+          {STAGES.map((item, index) => {
+
+            const currentIndex = STAGES.indexOf(stage);
+
+            const active = currentIndex >= index;
+
+            return (
+              <span
+                key={item}
+                className={
+                  active
+                    ? "stage-dot active"
+                    : "stage-dot"
+                }
+              />
+            );
+          })}
+        </div>
+
+        <section className="page-wrap">
+
+          {stage === "upload" && (
+            <Upload
+              onSelect={selectFile}
+              inputRef={inputRef}
+              onChooseFile={handleFileChange}
+            />
+          )}
+
+          {stage === "auto" && (
+            <AutoEdit
+              file={file}
+              videoUrl={videoUrl}
+              enabled={autoEdit}
+              setEnabled={setAutoEdit}
+              onCreate={createClips}
+              onChangeVideo={() => inputRef.current?.click()}
+            />
+          )}
+
+          {stage === "processing" && (
+            <Processing
+              file={file}
+              progress={progress}
+            />
+          )}
+
+          {stage === "results" && (
+            <Results
+              file={file}
+              videoUrl={videoUrl}
+              onStartOver={startOver}
+            />
+          )}
+
+        </section>
+
+      </main>
+
+      <input
+        ref={inputRef}
+        hidden
+        type="file"
+        accept="video/mp4,video/quicktime,video/webm,video/*"
+        onChange={handleFileChange}
+      />
+
+    </div>
+  );
 }
-function formatTime(s){if(!s||!Number.isFinite(s))return"00:00";return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`}
-function Plan({name,price,description,features,featured}){return <div className={featured?"plan-card featured":"plan-card"}>{featured&&<div className="featured-label">MOST POWERFUL</div>}<span className="plan-name">{name}</span><div className="plan-price">{price}{price!=="₹0"&&<small>/month</small>}</div><p>{description}</p><ul>{features.map(f=><li key={f}><span>✓</span>{f}</li>)}</ul><button className={featured?"export-button full":"secondary-action full"}>{name==="Free"?"Current plan":"Choose plan"}</button></div>}
-export default App;
