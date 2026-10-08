@@ -94,22 +94,18 @@ export default function App() {
 
   return (
     <div className="app-shell">
-
       <Header
         stage={stage}
         onStartOver={startOver}
       />
 
       <main>
-
         <div
           className="stage-progress"
           aria-label="GoViral workflow progress"
         >
           {STAGES.map((item, index) => {
-
             const currentIndex = STAGES.indexOf(stage);
-
             const active = currentIndex >= index;
 
             return (
@@ -126,7 +122,6 @@ export default function App() {
         </div>
 
         <section className="page-wrap">
-
           {stage === "upload" && (
             <Upload
               onSelect={selectFile}
@@ -160,9 +155,7 @@ export default function App() {
               onStartOver={startOver}
             />
           )}
-
         </section>
-
       </main>
 
       <input
@@ -172,7 +165,6 @@ export default function App() {
         accept="video/mp4,video/quicktime,video/webm,video/*"
         onChange={handleFileChange}
       />
-
     </div>
   );
 }
