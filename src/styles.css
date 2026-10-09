@@ -424,3 +424,29 @@ padding: 10px 16px;
     font-size: 13px;
   }
 }
+
+/* Mobile tap feedback */
+button,
+a,
+input,
+select,
+textarea,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth, intentional interaction */
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* Keep keyboard accessibility */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #c5ff45;
+  outline-offset: 3px;
+}
+
