@@ -1,18 +1,19 @@
 {
-  "name": "goviral-v2-autoedit",
-  "private": true,
-  "version": "2.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "^5.0.4",
-    "vite": "^7.1.7",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
-  },
-  "devDependencies": {}
+"name": "goviral-v2-autoedit",
+"private": true,
+"version": "2.0.0",
+"type": "module",
+"scripts": {
+"dev": "vite",
+"build": "vite build",
+"preview": "vite preview"
+},
+"dependencies": {
+"@vitejs/plugin-react": "^5.0.4",
+"@supabase/supabase-js": "^2.57.0",
+"vite": "^7.1.7",
+"react": "^19.2.0",
+"react-dom": "^19.2.0"
+},
+"devDependencies": {}
 }
