@@ -1,48 +1,105 @@
-const demoClips = [
-  { score: 94, title: "The part nobody tells you about.", time: "00:38", tone: "one" },
-  { score: 88, title: "This changes how you see it.", time: "00:31", tone: "two" },
-  { score: 81, title: "Most people get this completely wrong.", time: "00:27", tone: "three" },
-];
 
-export default function Results({ file, videoUrl, onStartOver }) {
+function formatTime(seconds) {
+  const value = Math.max(0, Math.floor(seconds || 0));
+  const minutes = Math.floor(value / 60);
+  const remainder = value % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+}
+
+export default function Results({
+  file,
+  clips = [],
+  outputFormat,
+  onStartOver,
+}) {
   return (
     <section className="screen results-screen">
       <div className="results-top">
         <div>
           <div className="eyebrow">04 / YOUR CLIPS</div>
-          <h1>Ready to <span>publish.</span></h1>
-          <p>GoViral found 3 moments with strong short-form potential.</p>
+          <h1>Real clips.<br /><span>Ready to save.</span></h1>
+          <p>
+            {clips.length} real MP4{" "}
+            {clips.length === 1 ? "clip was" : "clips were"} created
+            from your uploaded video.
+          </p>
         </div>
-        <button className="quiet-button" onClick={onStartOver}>+ New video</button>
+
+        <button
+          type="button"
+          className="quiet-button"
+          onClick={onStartOver}
+        >
+          + New video
+        </button>
       </div>
 
-      <div className="clip-grid">
-        {demoClips.map((clip, index) => (
-          <article className="clip-card" key={clip.title}>
-            <div className={`clip-preview ${clip.tone}`}>
-              {videoUrl ? <video src={videoUrl} muted playsInline /> : null}
-              <div className="clip-overlay" />
-              <span className="clip-rank">#{index + 1}</span>
-              <span className="clip-score">{clip.score} <small>ENGAGEMENT</small></span>
-              <button className="play-button" aria-label={`Preview clip ${index + 1}`}>▶</button>
-              <span className="clip-duration">{clip.time}</span>
-            </div>
-            <div className="clip-content">
-              <span className="clip-label">STRONG MOMENT</span>
-              <h2>“{clip.title}”</h2>
-              <div className="clip-actions">
-                <button className="secondary-button">Edit</button>
-                <button className="primary-small">Export <span>↗</span></button>
+      {clips.length === 0 ? (
+        <div className="control-card">
+          <h2>No clips generated</h2>
+          <p>Go back and try processing your video again.</p>
+          <button
+            type="button"
+            className="primary-button"
+            onClick={onStartOver}
+          >
+            Choose another video →
+          </button>
+        </div>
+      ) : (
+        <div className="clip-grid">
+          {clips.map((clip, index) => (
+            <article className="clip-card" key={clip.id}>
+              <div className="clip-preview generated-clip">
+                <video
+                  src={clip.url}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  aria-label={`Preview ${clip.title}`}
+                />
+                <span className="clip-rank">#{index + 1}</span>
+                <span className="clip-duration">
+                  {formatTime(clip.duration)}
+                </span>
               </div>
-            </div>
-          </article>
-        ))}
-      </div>
+
+              <div className="clip-content">
+                <span className="clip-label">
+                  MP4 · {clip.format || outputFormat}
+                </span>
+
+                <h2>{clip.title}</h2>
+
+                <p className="clip-meta">
+                  Starts at {formatTime(clip.start)} ·{" "}
+                  {formatTime(clip.duration)} long
+                </p>
+
+                <div className="clip-actions">
+                  <a
+                    className="primary-small download-link"
+                    href={clip.url}
+                    download={clip.fileName || `goviral-clip-${index + 1}.mp4`}
+                  >
+                    Download MP4 <span>↓</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
 
       <div className="results-footer">
-        <span><b>{file?.name}</b> · 3 clips generated</span>
-        <span>Captions · 9:16 · 720p</span>
+        <span><b>{file?.name || "Your video"}</b> · {clips.length} clips</span>
+        <span>{outputFormat} · MP4</span>
       </div>
+
+      <p className="fine-print">
+        These are basic video cuts, not AI-selected highlights yet.
+      </p>
     </section>
   );
 }
