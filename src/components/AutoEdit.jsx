@@ -1,21 +1,75 @@
-
 export default function AutoEdit({
   file,
   videoUrl,
-  enabled,
-  setEnabled,
+  mode,
+  setMode,
   format,
   setFormat,
+  targetDuration,
+  setTargetDuration,
+  introDuration,
+  setIntroDuration,
+  endingDuration,
+  setEndingDuration,
   processingError,
   onCreate,
   onChangeVideo,
 }) {
+  function chooseMode(nextMode) {
+    setMode(nextMode);
+
+    if (nextMode === "short") {
+      setTargetDuration(30);
+      setIntroDuration(5);
+      setEndingDuration(5);
+      setFormat("9:16");
+    }
+
+    if (nextMode === "long") {
+      setTargetDuration(300);
+      setIntroDuration(10);
+      setEndingDuration(10);
+      setFormat("16:9");
+    }
+
+    if (nextMode === "custom") {
+      setTargetDuration(60);
+      setIntroDuration(5);
+      setEndingDuration(5);
+    }
+  }
+
+  const mainDuration =
+    Number(targetDuration) -
+    Number(introDuration) -
+    Number(endingDuration);
+
+  const validSettings =
+    Number(targetDuration) >= 15 &&
+    Number(targetDuration) <= 1800 &&
+    Number(introDuration) >= 0 &&
+    Number(endingDuration) >= 0 &&
+    mainDuration > 0 &&
+    Number(introDuration) + Number(endingDuration) <
+      Number(targetDuration);
+
+  function handleCreate() {
+    if (!validSettings) return;
+
+    onCreate(format, {
+      mode,
+      targetDuration: Number(targetDuration),
+      introDuration: Number(introDuration),
+      endingDuration: Number(endingDuration),
+    });
+  }
+
   return (
     <section className="screen auto-screen">
       <div className="screen-top">
         <div>
-          <div className="eyebrow">02 / AUTO EDIT</div>
-          <h1>Make real<br /><span>video clips.</span></h1>
+          <div className="eyebrow">02 / EDIT YOUR VIDEO</div>
+          <h1>One video.<br /><span>Your style.</span></h1>
         </div>
 
         <button
@@ -29,18 +83,16 @@ export default function AutoEdit({
 
       <div className="source-strip">
         <div className="source-thumb">
-          {videoUrl ? (
+          {videoUrl && (
             <video src={videoUrl} muted playsInline />
-          ) : (
-            <span>VIDEO</span>
           )}
         </div>
 
         <div className="source-info">
-          <strong>{file?.name}</strong>
+          <strong>{file?.name || "No video selected"}</strong>
           <span>
             {file
-              ? `${(file.size / (1024 * 1024)).toFixed(1)} MB · On-device processing`
+              ? `${(file.size / (1024 * 1024)).toFixed(1)} MB · Browser processing`
               : "Choose a source video"}
           </span>
         </div>
@@ -51,28 +103,77 @@ export default function AutoEdit({
       <div className="auto-layout">
         <div className="auto-copy">
           <div className="auto-badge">
-            REAL MP4 EXPORT <span>PROTOTYPE</span>
+            EDITING MODE <span>MP4 EXPORT</span>
           </div>
 
-          <h2>One video.<br />Real clips.</h2>
+          <h2>Choose how<br />you want to edit.</h2>
 
           <p>
-            Create actual MP4 clips from different points in your
-            video. Choose a format, preview the results and download
-            each clip. AI highlight detection and captions will come
-            in a later phase.
+            Select a ready-made short video, a longer edit,
+            or set your own duration. GoViral will cut the
+            source video into sections and combine them.
           </p>
 
           <div className="feature-stack">
-            <div><b>01</b><span>Cut real video segments</span><i>✓</i></div>
-            <div><b>02</b><span>Choose output format</span><i>✓</i></div>
-            <div><b>03</b><span>Preview and download MP4</span><i>✓</i></div>
-            <div><b>04</b><span>AI highlight detection</span><i>→</i></div>
+            <div>
+              <b>01</b>
+              <span>Set your video duration</span>
+              <i>✓</i>
+            </div>
+            <div>
+              <b>02</b>
+              <span>Configure intro and ending</span>
+              <i>✓</i>
+            </div>
+            <div>
+              <b>03</b>
+              <span>Export one MP4 video</span>
+              <i>✓</i>
+            </div>
+            <div>
+              <b>04</b>
+              <span>AI highlights and captions</span>
+              <i>→</i>
+            </div>
           </div>
         </div>
 
         <div className="control-card">
-          <div className="control-label">OUTPUT FORMAT</div>
+          <div className="control-label">1. CHOOSE MODE</div>
+
+          <div className="mode-options">
+            <button
+              type="button"
+              className={mode === "short" ? "mode-option active" : "mode-option"}
+              onClick={() => chooseMode("short")}
+              aria-pressed={mode === "short"}
+            >
+              <strong>Short video</strong>
+              <span>30 seconds · 9:16</span>
+            </button>
+
+            <button
+              type="button"
+              className={mode === "long" ? "mode-option active" : "mode-option"}
+              onClick={() => chooseMode("long")}
+              aria-pressed={mode === "long"}
+            >
+              <strong>Long-form</strong>
+              <span>5 minutes · 16:9</span>
+            </button>
+
+            <button
+              type="button"
+              className={mode === "custom" ? "mode-option active" : "mode-option"}
+              onClick={() => chooseMode("custom")}
+              aria-pressed={mode === "custom"}
+            >
+              <strong>Custom</strong>
+              <span>Choose your own timing</span>
+            </button>
+          </div>
+
+          <div className="control-label">2. OUTPUT FORMAT</div>
 
           <div className="format-row">
             {["9:16", "1:1", "16:9"].map((item) => (
@@ -88,44 +189,108 @@ export default function AutoEdit({
             ))}
           </div>
 
-          <div className="switch-row">
-            <div>
-              <span className="switch-title">Multiple clips</span>
-              <small>
-                {enabled
-                  ? "Create up to 3 separate clips"
-                  : "Create one clip from the start"}
-              </small>
-            </div>
+          <div className="control-label">3. TIMING · SECONDS</div>
 
-            <button
-              type="button"
-              className={enabled ? "switch on" : "switch"}
-              onClick={() => setEnabled(!enabled)}
-              aria-label="Toggle multiple clips"
-              aria-pressed={enabled}
-            >
-              <i />
-            </button>
+          <div className="timing-fields">
+            <label>
+              Total duration
+              <input
+                type="number"
+                min="15"
+                max="1800"
+                step="1"
+                value={targetDuration}
+                disabled={mode === "short"}
+                onChange={(event) =>
+                  setTargetDuration(event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              Intro
+              <input
+                type="number"
+                min="0"
+                max="300"
+                step="1"
+                value={introDuration}
+                disabled={mode === "short"}
+                onChange={(event) =>
+                  setIntroDuration(event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              Ending
+              <input
+                type="number"
+                min="0"
+                max="300"
+                step="1"
+                value={endingDuration}
+                disabled={mode === "short"}
+                onChange={(event) =>
+                  setEndingDuration(event.target.value)
+                }
+              />
+            </label>
           </div>
 
-          <button
-            type="button"
-            className="primary-button"
-            onClick={() => onCreate(format, enabled)}
-          >
-            Generate MP4 clips <span>→</span>
-          </button>
+          <div className="duration-summary">
+            <div>
+              <span>INTRO</span>
+              <strong>{Number(introDuration) || 0}s</strong>
+            </div>
+            <div>
+              <span>MAIN CONTENT</span>
+              <strong>{mainDuration > 0 ? mainDuration : 0}s</strong>
+            </div>
+            <div>
+              <span>ENDING</span>
+              <strong>{Number(endingDuration) || 0}s</strong>
+            </div>
+          </div>
 
-          <small className="fine-print">
-            Testing version · Best with short videos under 150 MB
-          </small>
+          {mode === "short" && (
+            <p className="fine-print">
+              Fixed short format: 5s intro + 20s main + 5s ending.
+            </p>
+          )}
+
+          {mode !== "short" && (
+            <p className="fine-print">
+              Total duration must be 15–1800 seconds. Intro and
+              ending lengths are included in the total.
+            </p>
+          )}
+
+          {!validSettings && (
+            <p className="processing-error" role="alert">
+              Check your timing. Intro and ending must leave
+              some time for the main content.
+            </p>
+          )}
 
           {processingError && (
             <p className="processing-error" role="alert">
               {processingError}
             </p>
           )}
+
+          <button
+            type="button"
+            className="primary-button"
+            onClick={handleCreate}
+            disabled={!file || !validSettings}
+          >
+            Create final MP4 <span>→</span>
+          </button>
+
+          <small className="fine-print">
+            Prototype · Best with source videos under 150 MB
+          </small>
         </div>
       </div>
     </section>
