@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "./lib/supabase.js";
+import AuthScreen from "./components/AuthScreen.jsx";
 import Upload from "./components/Upload.jsx";
 import AutoEdit from "./components/AutoEdit.jsx";
 import Processing from "./components/Processing.jsx";
@@ -8,163 +10,204 @@ import Header from "./components/Header.jsx";
 const STAGES = ["upload", "auto", "processing", "results"];
 
 export default function App() {
-  const [stage, setStage] = useState("upload");
-  const [file, setFile] = useState(null);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [autoEdit, setAutoEdit] = useState(true);
-  const [progress, setProgress] = useState(0);
+const [session, setSession] = useState(null);
+const [authLoading, setAuthLoading] = useState(true);
+const [stage, setStage] = useState("upload");
+const [file, setFile] = useState(null);
+const [videoUrl, setVideoUrl] = useState("");
+const [autoEdit, setAutoEdit] = useState(true);
+const [progress, setProgress] = useState(0);
+const inputRef = useRef(null);
+const timerRef = useRef(null);
 
-  const inputRef = useRef(null);
+useEffect(() => {
+let mounted = true;
 
-  useEffect(() => {
-    return () => {
-      if (videoUrl) {
-        URL.revokeObjectURL(videoUrl);
-      }
-    };
-  }, [videoUrl]);
+supabase.auth.getSession().then(({ data, error }) => {
+  if (!mounted) return;
+  if (error) console.error("Session check failed:", error);
+  setSession(data?.session ?? null);
+  setAuthLoading(false);
+});
 
-  function selectFile(nextFile) {
-    if (!nextFile) return;
+const {
+  data: { subscription },
+} = supabase.auth.onAuthStateChange((_event, nextSession) => {
+  setSession(nextSession);
+  setAuthLoading(false);
+});
 
-    if (!nextFile.type.startsWith("video/")) {
-      alert("Please select a video file.");
-      return;
-    }
+return () => {
+  mounted = false;
+  subscription.unsubscribe();
+};
 
-    if (videoUrl) {
-      URL.revokeObjectURL(videoUrl);
-    }
+}, []);
 
-    const url = URL.createObjectURL(nextFile);
+useEffect(() => {
+return () => {
+if (videoUrl) URL.revokeObjectURL(videoUrl);
+if (timerRef.current) clearInterval(timerRef.current);
+};
+}, [videoUrl]);
 
-    setFile(nextFile);
-    setVideoUrl(url);
-    setProgress(0);
-    setStage("auto");
+function selectFile(nextFile) {
+if (!nextFile) return;
+
+if (!nextFile.type.startsWith("video/")) {
+  alert("Please select a valid video file.");
+  return;
+}
+
+if (videoUrl) URL.revokeObjectURL(videoUrl);
+
+setFile(nextFile);
+setVideoUrl(URL.createObjectURL(nextFile));
+setProgress(0);
+setStage("auto");
+
+}
+
+function handleFileChange(event) {
+const nextFile = event.target.files?.[0];
+if (nextFile) selectFile(nextFile);
+event.target.value = "";
+}
+
+function createClips() {
+if (!file) {
+inputRef.current?.click();
+return;
+}
+
+if (timerRef.current) clearInterval(timerRef.current);
+
+setStage("processing");
+setProgress(4);
+
+let value = 4;
+
+timerRef.current = setInterval(() => {
+  value = Math.min(value + 7, 100);
+  setProgress(value);
+
+  if (value >= 100) {
+    clearInterval(timerRef.current);
+    timerRef.current = null;
+    setTimeout(() => setStage("results"), 350);
   }
+}, 250);
 
-  function handleFileChange(event) {
-    const nextFile = event.target.files?.[0];
+}
 
-    if (nextFile) {
-      selectFile(nextFile);
-    }
+function startOver() {
+if (timerRef.current) clearInterval(timerRef.current);
+timerRef.current = null;
 
-    event.target.value = "";
-  }
+setFile(null);
+setVideoUrl("");
+setProgress(0);
+setStage("upload");
 
-  function createClips() {
-    if (!file) {
-      inputRef.current?.click();
-      return;
-    }
+}
 
-    setStage("processing");
-    setProgress(4);
+async function handleLogout() {
+const { error } = await supabase.auth.signOut();
+if (error) {
+alert("Could not sign out. Please try again.");
+} else {
+startOver();
+}
+}
 
-    let value = 4;
+if (authLoading) {
+return (
+<main className="auth-page">
+<div className="auth-card">
+<div className="auth-brand">GoViral</div>
+Checking your session...
+</div>
+</main>
+);
+}
 
-    const timer = setInterval(() => {
-      value += Math.floor(Math.random() * 8) + 5;
+if (!session) {
+return <AuthScreen />;
+}
 
-      if (value >= 100) {
-        value = 100;
-        clearInterval(timer);
+return (
+<div className="app-shell">
+<Header stage={stage} onStartOver={startOver} />
 
-        setTimeout(() => {
-          setStage("results");
-        }, 350);
-      }
+  <div className="account-bar">
+    <span>
+      {session.user.user_metadata?.display_name ||
+        session.user.email}
+    </span>
+    <button type="button" onClick={handleLogout}>
+      Log out
+    </button>
+  </div>
 
-      setProgress(value);
-    }, 220);
-  }
-
-  function startOver() {
-    if (videoUrl) {
-      URL.revokeObjectURL(videoUrl);
-    }
-
-    setFile(null);
-    setVideoUrl("");
-    setProgress(0);
-    setStage("upload");
-  }
-
-  return (
-    <div className="app-shell">
-      <Header
-        stage={stage}
-        onStartOver={startOver}
-      />
-
-      <main>
-        <div
-          className="stage-progress"
-          aria-label="GoViral workflow progress"
-        >
-          {STAGES.map((item, index) => {
-            const currentIndex = STAGES.indexOf(stage);
-            const active = currentIndex >= index;
-
-            return (
-              <span
-                key={item}
-                className={
-                  active
-                    ? "stage-dot active"
-                    : "stage-dot"
-                }
-              />
-            );
-          })}
-        </div>
-
-        <section className="page-wrap">
-          {stage === "upload" && (
-            <Upload
-              onSelect={selectFile}
-              inputRef={inputRef}
-              onChooseFile={handleFileChange}
-            />
-          )}
-
-          {stage === "auto" && (
-            <AutoEdit
-              file={file}
-              videoUrl={videoUrl}
-              enabled={autoEdit}
-              setEnabled={setAutoEdit}
-              onCreate={createClips}
-              onChangeVideo={() => inputRef.current?.click()}
-            />
-          )}
-
-          {stage === "processing" && (
-            <Processing
-              file={file}
-              progress={progress}
-            />
-          )}
-
-          {stage === "results" && (
-            <Results
-              file={file}
-              videoUrl={videoUrl}
-              onStartOver={startOver}
-            />
-          )}
-        </section>
-      </main>
-
-      <input
-        ref={inputRef}
-        hidden
-        type="file"
-        accept="video/mp4,video/quicktime,video/webm,video/*"
-        onChange={handleFileChange}
-      />
+  <main>
+    <div
+      className="stage-progress"
+      aria-label="GoViral workflow progress"
+    >
+      {STAGES.map((item, index) => (
+        <span
+          key={item}
+          className={
+            STAGES.indexOf(stage) >= index
+              ? "stage-dot active"
+              : "stage-dot"
+          }
+        />
+      ))}
     </div>
-  );
+
+    <section className="page-wrap">
+      {stage === "upload" && (
+        <Upload
+          onSelect={selectFile}
+          inputRef={inputRef}
+          onChooseFile={handleFileChange}
+        />
+      )}
+
+      {stage === "auto" && (
+        <AutoEdit
+          file={file}
+          videoUrl={videoUrl}
+          enabled={autoEdit}
+          setEnabled={setAutoEdit}
+          onCreate={createClips}
+          onChangeVideo={() => inputRef.current?.click()}
+        />
+      )}
+
+      {stage === "processing" && (
+        <Processing file={file} progress={progress} />
+      )}
+
+      {stage === "results" && (
+        <Results
+          file={file}
+          videoUrl={videoUrl}
+          onStartOver={startOver}
+        />
+      )}
+    </section>
+  </main>
+
+  <input
+    ref={inputRef}
+    hidden
+    type="file"
+    accept="video/*"
+    onChange={handleFileChange}
+  />
+</div>
+
+);
 }
