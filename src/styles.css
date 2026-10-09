@@ -270,3 +270,36 @@ transform: translateY(0);
 }
 }
 }
+
+.account-bar {
+display: flex;
+align-items: center;
+justify-content: flex-end;
+gap: 14px;
+padding: 10px 24px;
+border-bottom: 1px solid #292e36;
+color: #929aa5;
+font-size: 12px;
+}
+
+.account-bar span {
+max-width: 65%;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+.account-bar button {
+padding: 8px 12px;
+border: 1px solid #292e36;
+border-radius: 9px;
+background: #111419;
+color: #f4f7f1;
+cursor: pointer;
+}
+
+@media (max-width: 480px) {
+.account-bar {
+padding: 10px 16px;
+}
+}
