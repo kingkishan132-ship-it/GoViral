@@ -71,3 +71,202 @@ h1,h2{font-family:"Space Grotesk",sans-serif}
 @media(max-width:800px){
  .header{height:62px;padding:0 16px}.header-center{display:none}.usage{display:none}.stage-progress{top:61px}.stage-dot{width:17px}.page-wrap{padding:54px 16px 40px}.upload-screen{padding-top:2vh}.upload-screen h1{font-size:clamp(43px,12vw,62px)}.lead{font-size:12px;margin:17px auto 25px}.upload-zone{min-height:330px;border-radius:18px}.trust-row{gap:11px;flex-wrap:wrap;justify-content:flex-start;font-size:8px}.screen-top,.results-top,.processing-heading{align-items:flex-start}.screen-top h1,.results-top h1{font-size:43px}.source-strip{margin-top:23px}.auto-layout{grid-template-columns:1fr;margin-top:10px}.auto-copy{padding:22px}.auto-copy h2{font-size:34px}.control-card{padding:20px}.processing-heading>strong{font-size:32px}.processing-track{margin:28px 0 18px}.processing-grid{grid-template-columns:1fr 1fr}.process-step{padding:13px}.clip-grid{grid-template-columns:1fr;margin-top:22px}.clip-preview{height:430px}.results-footer{display:grid;gap:7px}.results-top .quiet-button{margin-top:18px}.results-top{display:block}}
 @media(max-width:420px){.processing-grid{grid-template-columns:1fr}.upload-zone{min-height:300px}.auto-copy h2{font-size:30px}.clip-preview{height:390px}}
+/* GoViral authentication screen */
+.auth-page {
+min-height: 100vh;
+min-height: 100dvh;
+display: grid;
+place-items: center;
+padding: 24px;
+background: #08090b;
+color: #f4f7f1;
+}
+
+.auth-card {
+width: 100%;
+max-width: 440px;
+margin: auto;
+padding: 32px;
+background: #111419;
+border: 1px solid #292e36;
+border-radius: 20px;
+}
+
+.auth-brand {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 44px;
+font-size: 21px;
+font-weight: 750;
+}
+
+.auth-brand .brand-mark {
+color: #c5ff3d;
+font-size: 28px;
+}
+
+.auth-brand .brand-mark span {
+color: #c5ff3d;
+}
+
+.auth-card .eyebrow {
+margin-bottom: 14px;
+color: #929aa5;
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 2px;
+}
+
+.auth-card h1 {
+margin: 0;
+font-size: clamp(38px, 9vw, 54px);
+line-height: 1.04;
+letter-spacing: -2px;
+}
+
+.auth-card h1 span {
+color: #c5ff3d;
+}
+
+.auth-intro {
+margin: 16px 0 28px;
+color: #929aa5;
+line-height: 1.6;
+}
+
+.auth-form {
+display: grid;
+gap: 18px;
+}
+
+.auth-form label {
+display: grid;
+gap: 9px;
+color: #e7eae5;
+font-size: 13px;
+font-weight: 600;
+}
+
+.auth-form input {
+width: 100%;
+min-height: 48px;
+padding: 13px 14px;
+border: 1px solid #292e36;
+border-radius: 9px;
+outline: none;
+background: #08090b;
+color: #f4f7f1;
+font: inherit;
+font-size: 15px;
+}
+
+.auth-form input:focus {
+border-color: #c5ff3d;
+box-shadow: 0 0 0 3px #c5ff3d20;
+}
+
+.auth-submit {
+width: 100%;
+min-height: 50px;
+margin-top: 4px;
+border: 0;
+border-radius: 9px;
+background: #c5ff3d;
+color: #08090b;
+font-size: 15px;
+font-weight: 750;
+cursor: pointer;
+}
+
+.auth-submit:disabled {
+opacity: 0.6;
+cursor: wait;
+}
+
+.auth-link {
+padding: 0;
+border: 0;
+background: transparent;
+color: #c5ff3d;
+font: inherit;
+font-weight: 650;
+cursor: pointer;
+}
+
+.forgot-link {
+justify-self: end;
+font-size: 13px;
+}
+
+.auth-switch {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 8px;
+margin-top: 25px;
+color: #929aa5;
+font-size: 13px;
+}
+
+.auth-terms {
+margin: 24px 0 0;
+color: #737c87;
+font-size: 11px;
+line-height: 1.6;
+text-align: center;
+}
+
+.auth-alert {
+padding: 12px;
+margin-top: 16px;
+border-radius: 9px;
+font-size: 13px;
+line-height: 1.5;
+overflow-wrap: anywhere;
+}
+
+.auth-alert.error {
+border: 1px solid #ff727855;
+background: #ff727810;
+color: #ff9297;
+}
+
+.auth-alert.success {
+border: 1px solid #c5ff3d40;
+background: #c5ff3d0d;
+color: #c5ff3d;
+}
+
+@media (max-width: 480px) {
+.auth-page {
+padding: 16px;
+align-items: start;
+}
+
+.auth-card {
+padding: 24px 20px;
+margin-top: 24px;
+}
+
+.auth-brand {
+margin-bottom: 36px;
+}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+.auth-card {
+animation: auth-enter 350ms ease-out both;
+}
+
+@keyframes auth-enter {
+from {
+opacity: 0;
+transform: translateY(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+}
