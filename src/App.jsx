@@ -57,10 +57,11 @@ function createSegmentPlan(sourceDuration, settings) {
   ) {
     throw new Error("Intro and ending must leave time for main content.");
   }
-
+ 
   if (sourceDuration + 0.25 < target) {
+    const actual = Math.floor(sourceDuration);
     throw new Error(
-      "Your source video is shorter than the requested output. Choose a shorter target duration."
+      `This video is ${actual}s long, but the selected edit needs ${target}s. Choose Custom and set total duration to ${Math.max(15, actual)}s or less, or select a longer video.`
     );
   }
 
