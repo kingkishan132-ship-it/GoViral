@@ -1,9 +1,9 @@
+
 import { useRef, useState } from "react";
 
-export default function Upload({ onSelect, inputRef, onChooseFile }) {
+export default function Upload({ onSelect, onChooseFile }) {
   const [dragging, setDragging] = useState(false);
   const localRef = useRef(null);
-  const ref = inputRef || localRef;
 
   function drop(e) {
     e.preventDefault();
@@ -21,9 +21,13 @@ export default function Upload({ onSelect, inputRef, onChooseFile }) {
       </p>
 
       <button
+        type="button"
         className={dragging ? "upload-zone dragging" : "upload-zone"}
-        onClick={() => ref.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onClick={() => localRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
         onDragLeave={() => setDragging(false)}
         onDrop={drop}
       >
@@ -31,10 +35,16 @@ export default function Upload({ onSelect, inputRef, onChooseFile }) {
         <strong>Drop your long video here</strong>
         <span>or choose a video from your device</span>
         <b>Choose video</b>
-        <small>MP4 · MOV · WebM · Up to 2 GB</small>
+        <small>MP4 · MOV · WebM · Up to 150 MB</small>
       </button>
 
-      <input ref={ref} hidden type="file" accept="video/*" onChange={onChooseFile} />
+      <input
+        ref={localRef}
+        hidden
+        type="file"
+        accept="video/*"
+        onChange={onChooseFile}
+      />
 
       <div className="trust-row">
         <span>✦ Auto-selected moments</span>
