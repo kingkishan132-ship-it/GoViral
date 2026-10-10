@@ -233,7 +233,6 @@ export default function AutoEdit({
                 max="1800"
                 step="1"
                 value={targetDuration}
-                disabled={mode === "short"}
                 onChange={(event) =>
                   setTargetDuration(event.target.value)
                 }
@@ -248,7 +247,6 @@ export default function AutoEdit({
                 max="300"
                 step="1"
                 value={introDuration}
-                disabled={mode === "short"}
                 onChange={(event) =>
                   setIntroDuration(event.target.value)
                 }
@@ -263,7 +261,6 @@ export default function AutoEdit({
                 max="300"
                 step="1"
                 value={endingDuration}
-                disabled={mode === "short"}
                 onChange={(event) =>
                   setEndingDuration(event.target.value)
                 }
@@ -288,7 +285,7 @@ export default function AutoEdit({
 
           {mode === "short" && (
             <p className="fine-print">
-              Fixed short format: 5s intro + 20s main + 5s ending.
+              Short mode adapts to your source video. Adjust intro and ending to fit your edit.
             </p>
           )}
 
