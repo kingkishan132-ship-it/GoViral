@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 export default function AutoEdit({
   file,
   videoUrl,
@@ -15,6 +16,38 @@ export default function AutoEdit({
   onCreate,
   onChangeVideo,
 }) {
+  const [sourceDuration, setSourceDuration] = useState(0);
+
+  useEffect(() => {
+    if (!videoUrl) {
+      setSourceDuration(0);
+      return;
+    }
+
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    video.onloadedmetadata = () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        setSourceDuration(video.duration);
+      }
+    };
+
+    video.src = videoUrl;
+
+    return () => {
+      video.onloadedmetadata = null;
+      video.onerror = null;
+      video.removeAttribute("src");
+    };
+  }, [videoUrl]);
+
+  useEffect(() => {
+    if (mode !== "short" || sourceDuration <= 0) return;
+
+    const suggestedDuration = Math.min(30, Math.floor(sourceDuration));
+    setTargetDuration(Math.max(15, suggestedDuration));
+  }, [sourceDuration, mode, setTargetDuration]);
   function chooseMode(nextMode) {
     setMode(nextMode);
 
